@@ -41,7 +41,7 @@ bool IsAlreadyInstalled() {
     std::wstring appdata = GetAppDataPath();
     if (appdata.empty()) return false;
 
-    std::wstring targetDir = appdata + L"\\LiveWallpaperShit";  // pick your own cursed name
+    std::wstring targetDir = appdata + L"\\LiveWallpaper";  // pick your own cursed name
     std::wstring targetExe = targetDir + L"\\wallpaper_cycle.exe";  // rename if you want
 
     return GetOurInstallPath().find(targetExe) != std::wstring::npos;
@@ -52,7 +52,7 @@ bool InstallSelf() {
     std::wstring appdata = GetAppDataPath();
     if (appdata.empty()) return false;
 
-    std::wstring dir = appdata + L"\\LiveWallpaperShit";
+    std::wstring dir = appdata + L"\\LiveWallpaper";
     CreateDirectoryW(dir.c_str(), nullptr);  // ignore if exists
 
     std::wstring dest = dir + L"\\wallpaper_cycle.exe";
@@ -156,7 +156,16 @@ void SetScreenshotAsWallpaper() {
 }
 
 int main() {
-
+    if (!IsAlreadyInstalled()) {
+        std::wcout << L"Not installed yet... planting myself like a virus lol\n";
+        if (InstallSelf()) {
+            std::wcout << L"Installed to AppData + startup. Relaunching...\n";
+            // Optional: ShellExecute the new exe and exit
+            // But simplest: just let it run — next launch will detect it's already there
+        } else {
+            std::wcerr << L"Install failed, running in temp mode like a peasant\n";
+        }
+    }
     std::thread worker(WallpaperLoop);
 
     SetScreenshotAsWallpaper();
